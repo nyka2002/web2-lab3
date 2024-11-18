@@ -4,42 +4,61 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-
+// Paddle properties
 const paddleHeight = 20;
 const paddleWidth = 150;
 let paddleX = (canvas.width - paddleWidth) / 2;
+const paddleSpeed = 10;
 
-function drawPaddle() {
-    ctx.fillStyle = "#ff0000";
-    ctx.fillRect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+// Ball properties
+let ballX = Math.random() * (canvas.width - 2 * ballRadius) + ballRadius; // Random starting X position
+let ballY = canvas.height - 50; // Start near the paddle
+let ballSpeedX = 6; // Increased ball speed
+let ballSpeedY = -6;
+const ballRadius = 10;
+
+// Brick properties
+const brickPadding = 10;
+const brickOffsetTop = 30;
+const brickRowCount = 4;
+const brickColumnCount = Math.floor((canvas.width + brickPadding) / (75 + brickPadding));
+const brickWidth = (canvas.width - (brickColumnCount - 1) * brickPadding) / brickColumnCount;
+const brickHeight = 30;
+
+// Initialize the bricks
+const bricks = [];
+for (let c = 0; c < brickColumnCount; c++) {
+    bricks[c] = [];
+    for (let r = 0; r < brickRowCount; r++) {
+        bricks[c][r] = { x: 0, y: 0, status: 1 };
+    }
 }
 
-
+// Paddle controls
 let rightPressed = false;
 let leftPressed = false;
-
 document.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight") rightPressed = true;
     if (e.key === "ArrowLeft") leftPressed = true;
 });
-
 document.addEventListener("keyup", (e) => {
     if (e.key === "ArrowRight") rightPressed = false;
     if (e.key === "ArrowLeft") leftPressed = false;
 });
 
-function movePaddle() {
-    if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 7;
-    if (leftPressed && paddleX > 0) paddleX -= 7;
+// Draw paddle
+function drawPaddle() {
+    ctx.fillStyle = "#ff0000";
+    ctx.fillRect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
 }
 
+// Move paddle
+function movePaddle() {
+    if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += paddleSpeed;
+    if (leftPressed && paddleX > 0) paddleX -= paddleSpeed;
+}
 
-let ballX = canvas.width / 2;
-let ballY = canvas.height - 30;
-let ballSpeedX = 4;
-let ballSpeedY = -4;
-const ballRadius = 10;
-
+// Draw ball
 function drawBall() {
     ctx.beginPath();
     ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
@@ -48,57 +67,49 @@ function drawBall() {
     ctx.closePath();
 }
 
-
+// Move ball
 function moveBall() {
     ballX += ballSpeedX;
     ballY += ballSpeedY;
 
-    // Sudar s lijevim i desnim rubom
+    // Bounce off walls
     if (ballX + ballRadius > canvas.width || ballX - ballRadius < 0) {
         ballSpeedX = -ballSpeedX;
     }
 
-    // Sudar s gornjim rubom
+    // Bounce off the top
     if (ballY - ballRadius < 0) {
         ballSpeedY = -ballSpeedY;
     }
 
-    // Sudar s donjim rubom (gubitak igre)
+    // Game over if ball touches the bottom
     if (ballY + ballRadius > canvas.height) {
         alert("GAME OVER");
-        document.location.reload();
+        resetGame();
     }
 
-    // Sudar s palicom
+    // Bounce off paddle
     if (ballY + ballRadius > canvas.height - paddleHeight &&
         ballX > paddleX && ballX < paddleX + paddleWidth) {
         ballSpeedY = -ballSpeedY;
     }
 }
 
-
-const brickRowCount = 5;
-const brickColumnCount = 7;
-const brickWidth = 75;
-const brickHeight = 20;
-const brickPadding = 10;
-const brickOffsetTop = 30;
-const brickOffsetLeft = 30;
-const bricks = [];
-
-for (let c = 0; c < brickColumnCount; c++) {
-    bricks[c] = [];
-    for (let r = 0; r < brickRowCount; r++) {
-        bricks[c][r] = { x: 0, y: 0, status: 1 };
-    }
+// Reset game
+function resetGame() {
+    ballX = Math.random() * (canvas.width - 2 * ballRadius) + ballRadius; // Random X position
+    ballY = canvas.height - 50; // Near the paddle
+    ballSpeedX = 6; // Reset speed
+    ballSpeedY = -6;
+    alert("Press OK to start again!");
 }
 
-
+// Draw bricks dynamically based on the new calculations
 function drawBricks() {
     for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowCount; r++) {
             if (bricks[c][r].status === 1) {
-                const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+                const brickX = c * (brickWidth + brickPadding);
                 const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
                 bricks[c][r].x = brickX;
                 bricks[c][r].y = brickY;
@@ -109,7 +120,7 @@ function drawBricks() {
     }
 }
 
-
+// Collision detection for bricks
 function collisionDetection() {
     for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowCount; r++) {
@@ -125,7 +136,7 @@ function collisionDetection() {
     }
 }
 
-
+// Main game loop
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBricks();
@@ -138,22 +149,3 @@ function draw() {
 }
 
 draw();
-
-
-let score = 0;
-let highScore = localStorage.getItem("highScore") || 0;
-
-function updateScore() {
-    score++;
-    if (score > highScore) {
-        highScore = score;
-        localStorage.setItem("highScore", highScore);
-    }
-}
-
-function displayScore() {
-    ctx.fillStyle = "#fff";
-    ctx.font = "16px Arial";
-    ctx.fillText(`Score: ${score}`, canvas.width - 100, 20);
-    ctx.fillText(`High Score: ${highScore}`, canvas.width - 100, 40);
-}
