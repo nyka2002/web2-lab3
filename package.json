@@ -4,7 +4,7 @@
     "description": "A simple Breakout game built with HTML5 Canvas, CSS, and JavaScript",
     "main": "index.js",
     "scripts": {
-        "start": "http-server . -p 3000"
+        "start": "http-server . -p 8080"
     },
     "author": "Your Name",
     "license": "MIT",

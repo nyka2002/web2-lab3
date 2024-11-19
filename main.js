@@ -8,29 +8,29 @@ canvas.height = window.innerHeight;
 const paddleHeight = 20;
 const paddleWidth = 150;
 let paddleX = (canvas.width - paddleWidth) / 2;
-const paddleSpeed = 10;
+const paddleSpeed = 10; // Increased paddle speed
 
 // Ball properties
-let ballX = Math.random() * (canvas.width - 2 * ballRadius) + ballRadius; // Random starting X position
-let ballY = canvas.height - 50; // Start near the paddle
+let ballX = canvas.width / 2;
+let ballY = canvas.height - 30;
 let ballSpeedX = 6; // Increased ball speed
-let ballSpeedY = -6;
+let ballSpeedY = -6; // Increased ball speed
 const ballRadius = 10;
 
 // Brick properties
-const brickPadding = 10;
-const brickOffsetTop = 30;
-const brickRowCount = 4;
-const brickColumnCount = Math.floor((canvas.width + brickPadding) / (75 + brickPadding));
+const brickPadding = 10; // Space between bricks
+const brickOffsetTop = 30; // Space from the top of the canvas
+const brickRowCount = 4; // Number of rows (changed to 4)
+const brickColumnCount = Math.floor((canvas.width + brickPadding) / (75 + brickPadding)); // Dynamic column count
 const brickWidth = (canvas.width - (brickColumnCount - 1) * brickPadding) / brickColumnCount;
-const brickHeight = 30;
+const brickHeight = 30; // Increased brick height
 
 // Initialize the bricks
 const bricks = [];
 for (let c = 0; c < brickColumnCount; c++) {
     bricks[c] = [];
     for (let r = 0; r < brickRowCount; r++) {
-        bricks[c][r] = { x: 0, y: 0, status: 1 };
+        bricks[c][r] = { x: 0, y: 0, status: 1 }; // `status: 1` means the brick is visible
     }
 }
 
@@ -85,7 +85,7 @@ function moveBall() {
     // Game over if ball touches the bottom
     if (ballY + ballRadius > canvas.height) {
         alert("GAME OVER");
-        resetGame();
+        document.location.reload();
     }
 
     // Bounce off paddle
@@ -93,15 +93,6 @@ function moveBall() {
         ballX > paddleX && ballX < paddleX + paddleWidth) {
         ballSpeedY = -ballSpeedY;
     }
-}
-
-// Reset game
-function resetGame() {
-    ballX = Math.random() * (canvas.width - 2 * ballRadius) + ballRadius; // Random X position
-    ballY = canvas.height - 50; // Near the paddle
-    ballSpeedX = 6; // Reset speed
-    ballSpeedY = -6;
-    alert("Press OK to start again!");
 }
 
 // Draw bricks dynamically based on the new calculations
