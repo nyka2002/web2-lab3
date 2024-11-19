@@ -182,8 +182,8 @@ function updateHighScore() {
 }
 
 function resetGame() {
-    ballX = canvas.width / 2;
-    ballY = canvas.height - 50;
+    ballX = paddleX + paddleWidth / 2;
+    ballY = canvas.height - paddleHeight - ballRadius;
     ballSpeedX = (Math.random() * 4 + 2) * (Math.random() < 0.5 ? 1 : -1);
     ballSpeedY = -(Math.random() * 2 + 4);
     resetBricks();
